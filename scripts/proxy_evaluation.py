@@ -83,12 +83,14 @@ def evaluate_convincingness(df_in, model_shortname, dataset):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--proxy_model", type=str, choices=["mixtral-8x7B", "vicuna-33B"])
+    parser.add_argument("--evaluator_model", type=str, choices=["mixtral-8x7B", "vicuna-33B"])
     parser.add_argument("--dataset", type=str, choices=["ecqa", "nli"])
-    parser.add_argument("--task", type=str, choices=["ECQA_SecondBest_method_noS_500", "ECQA_SecondBest_method_S_500", "NLI_entail_to_neutral"])
+    parser.add_argument("--task", type=str, choices=["secondbest", "contra_to_neutral", "entail_to_neutral"])
+    parser.add_argument("--explainer_model", type=str, choices=["gpt4", "chat", "claude"])
+    parser.add_argument("--filename", type=str, default="with_nle.csv")
     args = parser.parse_args()
-    args.input_path = f"../data/{args.task}.csv"
-    args.output_path = f"../data/{args.proxy_model}/{args.task}.csv"
+    args.input_path = f"../data/{args.dataset}/{args.task}/{args.explainer_model}/{args.filename}.csv"
+    args.output_path = f"../data/{args.dataset}/{args.task}/{args.explainer_model}/{args.filename}_scored_by_{args.evaluator_model}.csv"
 
     print(args)
     

@@ -41,7 +41,7 @@ class LLM:
 
         elif model == "claude":
             self.bedrock_client = boto3.client(service_name="bedrock-runtime")
-            self.make_query = self.make_bedrock_query
+            self.make_query = self.make_claude_query
             
         elif model in self.hf_model_names.keys():
             
