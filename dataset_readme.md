@@ -7,7 +7,7 @@ The dataframe containing the questions and the adversarial tasks are located at:
 `data/{dataset}/{task}.csv`  
 
 The dataframes containing the NLEs are located at:  
-`data/{dataset}/{task}/{model}/{filename}{suffix}.csv`  
+`data/{dataset}/{task}/{model}/with_nle{suffix}.csv`  
 
 Here are the values of these variables:  
 - dataset: ECQA or NLI  
