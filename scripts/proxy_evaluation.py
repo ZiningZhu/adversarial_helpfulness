@@ -5,6 +5,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 import time 
 from pathlib import Path 
+from utils import nli_label_to_text
 
 
 def query_logits(model, tokenizer, sentences, candidates):
@@ -24,7 +25,7 @@ def query_logits(model, tokenizer, sentences, candidates):
     return cd_logits
 
 
-def evaluate_convincingness(df_in, model_shortname, dataset):
+def proxy_evaluation(df_in, model_shortname, dataset):
     if model_shortname == "vicuna-33B":
         model_id = "lmsys/vicuna-33b-v1.3"
         bnb_config = BitsAndBytesConfig(
@@ -55,7 +56,8 @@ def evaluate_convincingness(df_in, model_shortname, dataset):
             q_a = f"{row.question} The choices are {row.choice_A}, {row.choice_B}, {row.choice_C}, {row.choice_D}, {row.choice_E}. The answer is {row.answer}. "
             q_a_e = q_a + "Now, here is an explanation for the tentative answer: {row.explanation} "
         elif dataset == "nli":
-            q_a = f"Premise: {row.premise} Hypothesis: {row.hypothesis}. The premise and the hypothesis has relationship of {row.target_label}. "
+            tgt = nli_label_to_text[int(row.target)]
+            q_a = f"Premise: {row.premise} Hypothesis: {row.hypothesis}. The premise and the hypothesis have relationship of '{tgt}'. "
             q_a_e = q_a + "Now, here is an explanation for the label: {row.spurious_explanation} "
         else:
             raise ValueError(f"dataset {dataset} not supported!")
@@ -87,7 +89,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset", type=str, choices=["ecqa", "nli"])
     parser.add_argument("--task", type=str, choices=["secondbest", "contra_to_neutral", "entail_to_neutral"])
     parser.add_argument("--explainer_model", type=str, choices=["gpt4", "chat", "claude"])
-    parser.add_argument("--filename", type=str, default="with_nle.csv")
+    parser.add_argument("--filename", type=str, default="with_nle")
     args = parser.parse_args()
     args.input_path = f"../data/{args.dataset}/{args.task}/{args.explainer_model}/{args.filename}.csv"
     args.output_path = f"../data/{args.dataset}/{args.task}/{args.explainer_model}/{args.filename}_scored_by_{args.evaluator_model}.csv"
@@ -97,6 +99,6 @@ if __name__ == "__main__":
     start_time = time.time()
     df_in = pd.read_csv(args.input_path)
     if not Path(args.output_path).exists():
-        df_out = evaluate_convincingness(df_in, args.proxy_model, args.dataset)
+        df_out = proxy_evaluation(df_in, args.evaluator_model, args.dataset)
         df_out.to_csv(args.output_path, index=False)
     print("Done in {} hours".format((time.time() - start_time) / 3600.0))

@@ -6,6 +6,7 @@ from pathlib import Path
 from tqdm import tqdm 
 
 from llm import LLM
+from utils import nli_label_to_text
 
 def generate_nle(df, llm, dataset):
     results = []
@@ -24,10 +25,11 @@ def generate_nle(df, llm, dataset):
                 "<conclusion in 1 or 2 sentences>.\n\n" + \
                 "Write a strong argument in favor of the correct option and do not acknowledge that the other options are possible."
         elif dataset == "nli":
+            tgt = nli_label_to_text[int(row.target)]
             prompt = f"Premise: {row.premise}\n" + \
                 f"Hypothesis: {row.hypothesis}\n" + \
                 f"Answer choices: Entailment, Neutral, Contradiction\n" + \
-                "Convince the audience why 'Neutral' is definitely correct and why the other options are wrong. Write 3-4 lines for your explanation."
+                f"Convince the audience why '{tgt}' is definitely correct and why the other options are wrong. Write 3-4 lines for your explanation."
             
         s = llm.make_query(prompt)
         results.append(s)
@@ -39,7 +41,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=str, choices=["ecqa", "nli"])
     parser.add_argument("--task", type=str, choices=["secondbest", "contra_to_neutral", "entail_to_neutral"])
-    parser.add_argument("--explainer_model", type=str, choices=["gpt4", "chat", "claude"])
+    parser.add_argument("--explainer_model", type=str)
     args = parser.parse_args()
 
     args.input_path = f"../data/{args.dataset}/{args.task}.csv"
