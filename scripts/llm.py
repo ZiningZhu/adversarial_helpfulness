@@ -28,7 +28,7 @@ class LLM:
         }
         self.openai_model_names = {
             "chat": "gpt-3.5-turbo",
-            "gpt4": "gpt-4-32k-0613",
+            "gpt4": "gpt-4-0613",
             "gpt4.5": "gpt-4-0125-preview"
         }
         if model in self.openai_model_names:
