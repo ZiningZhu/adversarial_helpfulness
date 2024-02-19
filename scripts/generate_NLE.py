@@ -51,6 +51,9 @@ if __name__ == "__main__":
 
     llm = LLM(args.explainer_model)
 
-    df_out = generate_nle(df_in, llm, args.dataset)
-    df_out.to_csv(args.output_path, index=False)
-    print("Done in {:.4f} hours".format((time.time() - start_time / 3600.0)))
+    pth = Path(args.output_path)
+    if not pth.exists():
+        pth.parents[0].mkdir(parents=True, exist_ok=True)
+        df_out = generate_nle(df_in, llm, args.dataset)
+        df_out.to_csv(args.output_path, index=False)
+    print("Done in {:.4f} hours".format((time.time() - start_time) / 3600.0))
