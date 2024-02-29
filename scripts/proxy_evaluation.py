@@ -26,13 +26,20 @@ def query_logits(model, tokenizer, sentences, candidates):
 
 
 def proxy_evaluation(df_in, model_shortname, dataset):
-    if model_shortname == "vicuna-33B":
-        model_id = "lmsys/vicuna-33b-v1.3"
+    eight_bit_models = {
+        "vicuna-33B": "lmsys/vicuna-33b-v1.3"
+    }
+    four_bit_models = {
+        "mixtral-8x7B": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+        "wizardlm-70B": "WizardLM/WizardLM-70B-V1.0"
+    }
+    if model_shortname in eight_bit_models:
+        model_id = eight_bit_models[model_shortname]
         bnb_config = BitsAndBytesConfig(
             load_in_8bit=True
         )
-    elif model_shortname == "mixtral-8x7B":
-        model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    elif model_shortname in four_bit_models:
+        model_id = four_bit_models[model_shortname]
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_compute_dtype=torch.bfloat16
@@ -85,7 +92,7 @@ def proxy_evaluation(df_in, model_shortname, dataset):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--evaluator_model", type=str, choices=["mixtral-8x7B", "vicuna-33B"])
+    parser.add_argument("--evaluator_model", type=str)
     parser.add_argument("--dataset", type=str, choices=["ecqa", "nli"])
     parser.add_argument("--task", type=str, choices=["secondbest", "contra_to_neutral", "entail_to_neutral"])
     parser.add_argument("--explainer_model", type=str, choices=["gpt4", "chat", "claude"])
