@@ -3,8 +3,10 @@ import pandas as pd
 import numpy as np 
 import time 
 from pathlib import Path 
-from tqdm import tqdm 
+from tqdm import tqdm
+
 from llm import LLM
+from utils import nli_label_to_text
 
 strategies_and_description = """
 ---
@@ -30,7 +32,7 @@ def identify_strategy(df, llm, dataset):
         elif dataset == "nli":
             lbl = nli_label_to_text[int(row.label)]
             tgt = nli_label_to_text[int(row.target)]
-            q_a_c_e = f"Premise: {row.premise} Hypothesis: {row.hypothesis}. The premise and the hypothesis have relationship of `{lbl}`. Now, here is an explanation towards the relationship label '{tgt}': {row.spurious_explanation}"
+            q_a_c_e = f"Premise: {row.premise} Hypothesis: {row.hypothesis}. The premise and the hypothesis have relationship of `{lbl}`. Now, here is an explanation towards the relationship label '{tgt}': {row.explanation}"
         else:
             raise ValueError(f"dataset {dataset} not supported!")
 
