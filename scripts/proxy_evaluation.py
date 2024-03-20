@@ -65,7 +65,7 @@ def proxy_evaluation(df_in, model_shortname, dataset):
         elif dataset == "nli":
             tgt = nli_label_to_text[int(row.target)]
             q_a = f"Premise: {row.premise} Hypothesis: {row.hypothesis}. The premise and the hypothesis have relationship of '{tgt}'. "
-            q_a_e = q_a + "Now, here is an explanation for the label: {row.spurious_explanation} "
+            q_a_e = q_a + "Now, here is an explanation for the label: {row.explanation} "
         else:
             raise ValueError(f"dataset {dataset} not supported!")
         
